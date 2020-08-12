@@ -19,6 +19,9 @@ optusage(char opt) {
 		case 'd':
 			msg = "Delete a maqrah";
 			break;
+		case 'p':
+			msg = "Page information";
+			break;
 	}
 	fprintf(stderr,"-%c: %s\n",opt, msg);
 	die();
