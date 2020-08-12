@@ -18,7 +18,7 @@ main(int argc, char **argv){
 		die();
 	}
 
-	while ((opt = getopt(argc,argv, ":a:d:p:")) !=-1){
+	while ((opt = getopt(argc,argv, ":a:d:p:h")) !=-1){
 		switch (opt){
 			case 'a':
 				printf("%s", argv[2]);
@@ -33,11 +33,14 @@ main(int argc, char **argv){
 					 printf("Juz: %d \nMaqra: %d\nPage: %d-%d\n",p->number, m->number, m->start, m->end);
 					 break;
 				 }
+			case 'h': 
+				 usage();
+				  break;
 			default: 
-				if(opt == '?'){
-					fprintf(stderr, "Bad argument: -%c\n", optopt);
-					die();
-				} else optusage(optopt);
+				  if(opt == '?'){
+					  fprintf(stderr, "Bad argument: -%c\n", optopt);
+					  die();
+				  } else optusage(optopt);
 		}
 	}
 

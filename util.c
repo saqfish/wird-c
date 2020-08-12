@@ -1,3 +1,5 @@
+#define UTIL_G
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,7 +7,7 @@
 
 void
 usage(){
-	printf("Usage: -n N\n");
+	printf(usgstr);
 	die();
 }
 
