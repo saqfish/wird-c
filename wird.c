@@ -1,9 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "wird.h"
 
+
 int
-main(){
+main(int argc, char **argv){
+	int opt;
+	while ((opt = getopt(argc,argv, "a:")) !=-1){
+		switch (opt){
+			case 'a':
+				printf("%s", argv[2]);
+				break;
+			default: usage();
+		}
+	}
+
 	Juz *juzes[SIZE_JUZ];
 	for(int i=0;i<SIZE_JUZ;i++){
 		juzes[i] = malloc(sizeof(*juzes[i]));		
@@ -22,7 +34,19 @@ main(){
 		free(juzes[i]);
 	}
 
-	printf("Count: %d\n", SIZE_MAQRAH * SIZE_JUZ);
+	printf("0/%d\n", SIZE_MAQRAH * SIZE_JUZ);
 
-	return 0;
+	return EXIT_SUCCESS;
+}
+
+void
+usage(){
+	printf("Usage: -n N\n");
+	die();
+}
+
+void
+die(){
+	printf("Bye\n");
+	exit(EXIT_FAILURE);
 }

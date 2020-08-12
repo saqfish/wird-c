@@ -11,3 +11,5 @@ typedef struct {
 	int number;
 } Juz;
 
+void die();
+void usage();
