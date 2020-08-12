@@ -10,6 +10,3 @@ typedef struct {
 	Maqrah *maqrahs[SIZE_MAQRAH];
 	int number;
 } Juz;
-
-void die();
-void usage();

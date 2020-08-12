@@ -1,18 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "wird.h"
 
+#include "wird.h"
+#include "util.h"
 
 int
 main(int argc, char **argv){
+	opterr = 0;
 	int opt;
-	while ((opt = getopt(argc,argv, "a:")) !=-1){
+	while ((opt = getopt(argc,argv, ":a:d:")) !=-1){
 		switch (opt){
 			case 'a':
 				printf("%s", argv[2]);
 				break;
-			default: usage();
+			case 'd':
+				printf("%s", argv[2]);
+				break;
+			default: 
+				if(opt == '?'){
+					fprintf(stderr, "Bad argument: -%c\n", optopt);
+					die();
+				} else optusage(optopt);
 		}
 	}
 
@@ -34,19 +43,8 @@ main(int argc, char **argv){
 		free(juzes[i]);
 	}
 
-	printf("0/%d\n", SIZE_MAQRAH * SIZE_JUZ);
+	printf("30/%d\n", SIZE_MAQRAH * SIZE_JUZ);
 
 	return EXIT_SUCCESS;
 }
 
-void
-usage(){
-	printf("Usage: -n N\n");
-	die();
-}
-
-void
-die(){
-	printf("Bye\n");
-	exit(EXIT_FAILURE);
-}
