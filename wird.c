@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "pages.h"
 #include "wird.h"
 #include "util.h"
 
@@ -28,7 +29,7 @@ main(int argc, char **argv){
 	if(!generate()){
 		fprintf(stderr, "Error generating mushaf\n");
 		die();
-	}else printf("30/%d\n", SIZE_MAQRAH * SIZE_JUZ);
+	}else printf("%i\n", pages[0][6]);
 
 	return EXIT_SUCCESS;
 }
