@@ -25,12 +25,25 @@ main(int argc, char **argv){
 		}
 	}
 
+	if(!generate()){
+		fprintf(stderr, "Error generating mushaf\n");
+		die();
+	}else printf("30/%d\n", SIZE_MAQRAH * SIZE_JUZ);
+
+	return EXIT_SUCCESS;
+}
+
+int 
+generate(){
 	Juz *juzes[SIZE_JUZ];
+
 	for(int i=0;i<SIZE_JUZ;i++){
 		juzes[i] = malloc(sizeof(*juzes[i]));		
+		if(juzes[i] == NULL) return 0;
 		juzes[i]->number = i;
 		for(int j=0;j<SIZE_MAQRAH;j++){
-			juzes[i]->maqrahs[j] = malloc(SIZE_MAQRAH * sizeof(Maqrah*));		
+			juzes[i]->maqrahs[j] = malloc(sizeof(Maqrah*));		
+			if(juzes[i]->maqrahs[j] == NULL) return 0;
 			juzes[i]->maqrahs[j]->number = j;
 		}
 	}
@@ -43,8 +56,6 @@ main(int argc, char **argv){
 		free(juzes[i]);
 	}
 
-	printf("30/%d\n", SIZE_MAQRAH * SIZE_JUZ);
-
-	return EXIT_SUCCESS;
+	return 1;
 }
 
