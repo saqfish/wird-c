@@ -51,7 +51,7 @@ main(int argc, char **argv){
 	}
 
 	for(int i=0;i<SIZE_JUZ;i++){
-		for(int j=0;j<SIZE_MAQRAH;j++){
+		for(int j=0;j<SIZE_MAQRA;j++){
 			free(juzes[i]->maqras[j]);
 		}
 		free(juzes[i]);
@@ -63,7 +63,7 @@ main(int argc, char **argv){
 Maqra *
 getmaqrabypage(int page){
 	for(int i=0;i<SIZE_JUZ;i++){
-		for(int j=0;j<SIZE_MAQRAH;j++){
+		for(int j=0;j<SIZE_MAQRA;j++){
 			if(page >= juzes[i]->maqras[j]->start && page <= juzes[i]->maqras[j]->end) 
 				return juzes[i]->maqras[j];
 		}
@@ -78,8 +78,8 @@ generate(){
 		juzes[i] = malloc(sizeof(*juzes[i]));		
 		if(juzes[i] == NULL) return 0;
 		juzes[i]->number = i+1;
-		for(int j=0;j<SIZE_MAQRAH;j++){
-			int end = count <= SIZE_MAQRAH ? (count + 1) : count;
+		for(int j=0;j<SIZE_MAQRA;j++){
+			int end = count <= SIZE_MAQRA ? (count + 1) : count;
 
 			juzes[i]->maqras[j] = malloc(sizeof(*juzes[i]->maqras[j]));
 

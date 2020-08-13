@@ -1,5 +1,5 @@
 #define SIZE_JUZ 30
-#define SIZE_MAQRAH 8
+#define SIZE_MAQRA 8
 
 typedef struct {
 	int parent;
@@ -11,7 +11,7 @@ typedef struct {
 typedef struct {
 	int *pages;
 	int number;
-	Maqra *maqras[SIZE_MAQRAH];
+	Maqra *maqras[SIZE_MAQRA];
 } Juz;
 
 int generate();
