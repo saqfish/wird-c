@@ -1,11 +1,7 @@
 #ifndef UTIL_G
 #else
 
-char *usgstr = "Usage: \n"
-"-a <maqra> Add a maqrah \n"
-"-a <maqra> Delete a maqrah \n"
-"-p <page> Page information \n"
-"-h This help";
+char *usgstr = "usage: wird [-hio] [-p page] [-m maqra] [-j juz]";
 
 #endif /*UTIL_G_*/
 

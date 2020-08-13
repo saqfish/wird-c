@@ -21,8 +21,6 @@ main(int argc, char **argv){
 
 	opterr = 0;
 
-	if(!generate()) die("Error generating mushaf");
-
 	while ((opt = getopt(argc,argv, ":oia:d:j:m:p:h")) !=-1){
 		switch (opt){
 			case 'o':
@@ -32,68 +30,74 @@ main(int argc, char **argv){
 				verbose = 1;
 				break;
 			case 'm': t = MAQRA;
-				str = optarg;
-				break;
+				  str = optarg;
+				  break;
 			case 'p': t = PAGE;
-				str = optarg;
-				break;
+				  str = optarg;
+				  break;
 			case 'j': t = JUZ;
-				str = optarg;
-				break;
+				  str = optarg;
+				  break;
 			case 'h': 
-				usage();
-				break;
+				  usage();
+				  break;
 			default: 
-				if(opt == '?') 
-					vdie("Bad argument: -%c\n", optopt);
-				else optusage(optopt);
+				  if(opt == '?') 
+					  vdie("Bad argument: -%c\n", optopt);
+				  else optusage(optopt);
 		}
 	}
 
-	char *chkptr;
-	long value = strtol(str, &chkptr, 10);
-	if(chkptr == str)
-		die("Bad input. Maqra must be 1-240");
+	if (t){
+		if(!generate()) die("Error generating mushaf");
 
-	if(t == PAGE) {
-		if(value < 1 || value > 599) 
-			die("Bad input. Page must be 1-599");
-		m = getmaqrabypage(value);
-		p = juzes[m->parent];
-	}else if(t == MAQRA) {
-		if(value < 1 || value > 240) 
+		char *chkptr;
+		long value = strtol(str, &chkptr, 10);
+
+
+		if(chkptr == str)
 			die("Bad input. Maqra must be 1-240");
-		m = getmaqra(value);
-		p = juzes[m->parent];
-	}else if(t == JUZ){ 
-		if(value < 1 || value > 30) 
-			die("Bad input. Juz must be 1-30");
-		long indx = value-1;
-		p = juzes[indx];
-		m = p->maqras[0];
-	}
 
-	if(verbose) printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
-
-	if(spawn) {
-		if(fork() == 0){
-			char pstr[3];
-			sprintf(pstr, "%d", m->start + offset);
-
-			char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
-
-			execvp(pdfcmd[0], cmd); 
-
-			die("Launch failed");
+		if(t == PAGE) {
+			if(value < 1 || value > 599) 
+				die("Bad input. Page must be 1-599");
+			m = getmaqrabypage(value);
+			p = juzes[m->parent];
+		}else if(t == MAQRA) {
+			if(value < 1 || value > 240) 
+				die("Bad input. Maqra must be 1-240");
+			m = getmaqra(value);
+			p = juzes[m->parent];
+		}else if(t == JUZ){ 
+			if(value < 1 || value > 30) 
+				die("Bad input. Juz must be 1-30");
+			long indx = value-1;
+			p = juzes[indx];
+			m = p->maqras[0];
 		}
-	}
 
-	for(int i=0;i<SIZE_JUZ;i++){
-		for(int j=0;j<SIZE_MAQRA;j++){
-			free(juzes[i]->maqras[j]);
+		if(verbose || !spawn) printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+
+		if(spawn) {
+			if(fork() == 0){
+				char pstr[3];
+				sprintf(pstr, "%d", m->start + offset);
+
+				char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
+
+				execvp(pdfcmd[0], cmd); 
+
+				die("Launch failed");
+			}
 		}
-		free(juzes[i]);
-	}
+
+		for(int i=0;i<SIZE_JUZ;i++){
+			for(int j=0;j<SIZE_MAQRA;j++){
+				free(juzes[i]->maqras[j]);
+			}
+			free(juzes[i]);
+		}
+	}else usage();
 
 	return EXIT_SUCCESS;
 }

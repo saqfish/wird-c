@@ -15,23 +15,17 @@ void
 optusage(char opt) {
 	char *msg;
 	switch (opt){
-		case 'a':
-			msg = "Add a maqrah";
-			break;
-		case 'd':
-			msg = "Delete a maqrah";
-			break;
 		case 'j':
-			msg = "Juz information";
+			msg = "number: set juz";
 			break;
 		case 'm':
-			msg = "Maqra information";
+			msg = "number: set maqra";
 			break;
 		case 'p':
-			msg = "Page information";
+			msg = "number: set page";
 			break;
 	}
-	vdie("-%c: %s\n",opt, msg);
+	vdie("-%c %s\n",opt, msg);
 }
 
 void
