@@ -1,5 +1,6 @@
 #define UTIL_G
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,8 +8,7 @@
 
 void
 usage(){
-	printf(usgstr);
-	die();
+	die(usgstr);
 }
 
 void
@@ -31,11 +31,23 @@ optusage(char opt) {
 			msg = "Page information";
 			break;
 	}
-	fprintf(stderr,"-%c: %s\n",opt, msg);
-	die();
+	vdie("-%c: %s\n",opt, msg);
 }
 
 void
-die(){
+vdie(char *fmt, ...){
+
+	va_list ap;
+	va_start(ap,fmt);
+
+	vfprintf(stderr, fmt, ap);
+
+	va_end(ap);
+	exit(EXIT_FAILURE);
+}
+
+void
+die(char *str){
+	fprintf(stderr, "%s\n", str);
 	exit(EXIT_FAILURE);
 }

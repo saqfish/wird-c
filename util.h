@@ -5,12 +5,13 @@ char *usgstr = "Usage: \n"
 "-a <maqra> Add a maqrah \n"
 "-a <maqra> Delete a maqrah \n"
 "-p <page> Page information \n"
-"-h This help \n";
+"-h This help";
 
 #endif /*UTIL_G_*/
 
 
 void usage();
-void optusage(char opt);
-void die();
+void optusage(char );
+void vdie(char *, ...);
+void die(char *);
 

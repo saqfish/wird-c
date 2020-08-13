@@ -13,10 +13,7 @@ main(int argc, char **argv){
 	opterr = 0;
 	int opt;
 
-	if(!generate()){
-		fprintf(stderr, "Error generating mushaf\n");
-		die();
-	}
+	if(!generate()) die("Error generating mushaf");
 
 	while ((opt = getopt(argc,argv, ":a:d:j:m:p:h")) !=-1){
 		switch (opt){
@@ -41,12 +38,11 @@ main(int argc, char **argv){
 				 }
 			case 'h': 
 				 usage();
-				  break;
+				 break;
 			default: 
-				  if(opt == '?'){
-					  fprintf(stderr, "Bad argument: -%c\n", optopt);
-					  die();
-				  } else optusage(optopt);
+				 if(opt == '?') 
+					 vdie("Bad argument: -%c\n", optopt);
+				 else optusage(optopt);
 		}
 	}
 
