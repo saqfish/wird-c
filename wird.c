@@ -15,7 +15,6 @@ int
 main(int argc, char **argv){
 	int opt, t;
 	char *str;
-	pid_t pid;
 	Juz *p;
 	Maqra *m;
 
@@ -52,6 +51,7 @@ main(int argc, char **argv){
 		if(!generate()) die("Error generating mushaf");
 
 		char *chkptr;
+		int page;
 		long value = strtol(str, &chkptr, 10);
 
 
@@ -61,7 +61,8 @@ main(int argc, char **argv){
 		if(t == PAGE) {
 			if(value < 1 || value > 599) 
 				die("Bad input. Page must be 1-599");
-			m = getmaqrabypage(value);
+			page = value;
+			m = getmaqrabypage(page);
 			p = juzes[m->parent];
 		}else if(t == MAQRA) {
 			if(value < 1 || value > 240) 
@@ -81,7 +82,8 @@ main(int argc, char **argv){
 		if(spawn) {
 			if(fork() == 0){
 				char pstr[3];
-				sprintf(pstr, "%d", m->start + offset);
+				int pchk = t == PAGE ? page : m->start;
+				sprintf(pstr, "%d", pchk + offset);
 
 				char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
 
