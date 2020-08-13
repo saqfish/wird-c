@@ -15,6 +15,11 @@ typedef struct {
 	Maqra *maqras[SIZE_MAQRA];
 } Juz;
 
+void maqrainfo(char *);
+void juzinfo(char *);
+void pageinfo(char *);
+
 int generate();
+
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);

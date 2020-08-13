@@ -24,65 +24,14 @@ main(int argc, char **argv){
 				printf("%s", optarg);
 				break;
 			case 'j':
-				{
-					Juz *p;
-					char *chkptr;
-
-					long value = strtol(optarg, &chkptr, 10);
-
-					if(chkptr == optarg) 
-						die("Not a valid number. Must be 1-30");
-
-					long indx = value-1;
-
-					if(value < 1 || value > 30) 
-						die("Bad range. Must be 1-30");
-
-
-					printf("Juz #%d: \n", juzes[indx]->number);
-
-					for(int j=0;j<SIZE_MAQRA;j++)
-						printf("Maqra #%d Pages: %d-%d \n", juzes[indx]->maqras[j]->number, juzes[indx]->maqras[j]->start, juzes[indx]->maqras[j]->end);
-
-					break;
-				}
+				juzinfo(optarg);
+				break;
 			case 'm':
-				{
-					 Maqra *m;
-					 Juz *p;
-					 char *chkptr;
-
-					 long value = strtol(optarg, &chkptr, 10);
-
-					 if(chkptr == optarg) 
-						 die("Not a valid number. Must be 1-599");
-					 if(value < 1 || value > 599) 
-						 die("Bad range. Must be 1-599");
-
-					 m = getmaqra(value);
-					 p = juzes[m->parent];
-
-					 printf("Maqra #%d:\nJuz #%d Pages: %d-%d\n", m->number,p->number, m->start, m->end);
-					 break;
-				}
-			case 'p':{
-					 Maqra *m;
-					 Juz *p;
-					 char *chkptr;
-
-					 long value = strtol(optarg, &chkptr, 10);
-
-					 if(chkptr == optarg) 
-						 die("Not a valid number. Must be 1-599");
-					 if(value < 1 || value > 599) 
-						 die("Bad range. Must be 1-599");
-
-					 if((m = getmaqrabypage(value)) == NULL) die("Problem");
-					 p = juzes[m->parent];
-
-					 printf("Page #%d:\nJuz #%d Maqra #%d\n", value ,p->number, m->number);
-					 break;
-				 }
+				maqrainfo(optarg);
+				break;
+			case 'p':
+				pageinfo(optarg);
+				break;
 			case 'h': 
 				 usage();
 				 break;
@@ -101,6 +50,58 @@ main(int argc, char **argv){
 	}
 
 	return EXIT_SUCCESS;
+}
+void
+maqrainfo(char *str){
+	Maqra *m;
+	Juz *p;
+	char *chkptr;
+
+	long value = strtol(str, &chkptr, 10);
+
+	if(chkptr == str || (value < 1 || value > 599)) 
+		die("Bad input. Maqra must be 1-240");
+
+	m = getmaqra(value);
+	p = juzes[m->parent];
+
+	printf("Maqra #%d:\nJuz #%d Pages: %d-%d\n", m->number,p->number, m->start, m->end);
+}
+
+void
+juzinfo(char *str)
+{
+	Juz *p;
+	char *chkptr;
+
+	long value = strtol(str, &chkptr, 10);
+
+	if(chkptr == str || (value < 1 || value > 30)) 
+		die("Bad input. Juz must be 1-30");
+
+	long indx = value-1;
+
+	printf("Juz #%d: \n", juzes[indx]->number);
+
+	for(int j=0;j<SIZE_MAQRA;j++)
+		printf("Maqra #%d Pages: %d-%d \n", juzes[indx]->maqras[j]->number, juzes[indx]->maqras[j]->start, juzes[indx]->maqras[j]->end);
+}
+
+void
+pageinfo(char *str){
+	Maqra *m;
+	Juz *p;
+	char *chkptr;
+
+	long value = strtol(str, &chkptr, 10);
+
+	if(chkptr == str || (value < 1 || value > 30)) 
+		die("Bad input. Page must be 1-599");
+
+	if((m = getmaqrabypage(value)) == NULL) die("Problem");
+	p = juzes[m->parent];
+
+	printf("Page #%d:\nJuz #%d Maqra #%d\n", value ,p->number, m->number);
 }
 
 Maqra *
