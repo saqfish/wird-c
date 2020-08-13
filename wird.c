@@ -18,22 +18,69 @@ main(int argc, char **argv){
 	while ((opt = getopt(argc,argv, ":a:d:j:m:p:h")) !=-1){
 		switch (opt){
 			case 'a':
-				printf("%s", argv[2]);
+				printf("%s", optarg);
 				break;
 			case 'd':
-				printf("%s", argv[2]);
+				printf("%s", optarg);
 				break;
 			case 'j':
-				printf("%s", argv[2]);
-				break;
+				{
+					Juz *p;
+					char *chkptr;
+
+					long value = strtol(optarg, &chkptr, 10);
+
+					if(chkptr == optarg) 
+						die("Not a valid number. Must be 1-30");
+
+					long indx = value-1;
+
+					if(value < 1 || value > 30) 
+						die("Bad range. Must be 1-30");
+
+
+					printf("Juz #%d: \n", juzes[indx]->number);
+
+					for(int j=0;j<SIZE_MAQRA;j++)
+						printf("Maqra #%d Pages: %d-%d \n", juzes[indx]->maqras[j]->number, juzes[indx]->maqras[j]->start, juzes[indx]->maqras[j]->end);
+
+					break;
+				}
 			case 'm':
-				printf("%s", argv[2]);
-				break;
+				{
+					 Maqra *m;
+					 Juz *p;
+					 char *chkptr;
+
+					 long value = strtol(optarg, &chkptr, 10);
+
+					 if(chkptr == optarg) 
+						 die("Not a valid number. Must be 1-599");
+					 if(value < 1 || value > 599) 
+						 die("Bad range. Must be 1-599");
+
+					 m = getmaqra(value);
+					 p = juzes[m->parent];
+
+					 printf("Maqra #%d:\nJuz #%d Pages: %d-%d\n", m->number,p->number, m->start, m->end);
+					 break;
+				}
 			case 'p':{
-					 long value = strtol(argv[2], NULL, 10);
-					 Maqra *m = getmaqrabypage(value);
-					 Juz *p = juzes[m->parent];
-					 printf("Juz: %d \nMaqra: %d\nPage: %d-%d\n",p->number, m->number, m->start, m->end);
+					 Maqra *m;
+					 Juz *p;
+					 char *chkptr;
+
+					 long value = strtol(optarg, &chkptr, 10);
+
+					 if(chkptr == optarg) 
+						 die("Not a valid number. Must be 1-599");
+					 if(value < 1 || value > 599) 
+						 die("Bad range. Must be 1-599");
+
+					 if((m = getmaqrabypage(value)) == NULL) die("Problem");
+					 p = juzes[m->parent];
+
+					 printf("Page #%d:\nJuz #%d Maqra #%d\n", value ,p->number, m->number);
 					 break;
 				 }
 			case 'h': 
@@ -57,6 +104,18 @@ main(int argc, char **argv){
 }
 
 Maqra *
+getmaqra(int maqra){
+	int count = 0;
+	for(int i=0;i<SIZE_JUZ;i++)
+		for(int j=0;j<SIZE_MAQRA;j++){
+			if(count == (maqra-1)) 
+				return juzes[i]->maqras[j];
+			count++;
+		}
+	return NULL;
+}
+
+Maqra *
 getmaqrabypage(int page){
 	for(int i=0;i<SIZE_JUZ;i++){
 		for(int j=0;j<SIZE_MAQRA;j++){
@@ -75,7 +134,7 @@ generate(){
 		if(juzes[i] == NULL) return 0;
 		juzes[i]->number = i+1;
 		for(int j=0;j<SIZE_MAQRA;j++){
-			int end = count <= SIZE_MAQRA ? (count + 1) : count;
+			int end = count <= SIZE_MAQRAS ? (count + 1) : count;
 
 			juzes[i]->maqras[j] = malloc(sizeof(*juzes[i]->maqras[j]));
 

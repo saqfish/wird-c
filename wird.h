@@ -1,5 +1,6 @@
 #define SIZE_JUZ 30
 #define SIZE_MAQRA 8
+#define SIZE_MAQRAS 240
 
 typedef struct {
 	int parent;
@@ -15,4 +16,5 @@ typedef struct {
 } Juz;
 
 int generate();
-Maqra *getmaqrabypage(int page);
+Maqra *getmaqrabypage(int);
+Maqra *getmaqra(int);
