@@ -15,9 +15,11 @@ typedef struct {
 	Maqra *maqras[SIZE_MAQRA];
 } Juz;
 
-void maqrainfo(char *);
-void juzinfo(char *);
-void pageinfo(char *);
+enum type {
+	PAGE = 1,
+	MAQRA = 2,
+	JUZ = 4,
+};
 
 int generate();
 
