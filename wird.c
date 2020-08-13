@@ -18,7 +18,7 @@ main(int argc, char **argv){
 		die();
 	}
 
-	while ((opt = getopt(argc,argv, ":a:d:p:h")) !=-1){
+	while ((opt = getopt(argc,argv, ":a:d:j:m:p:h")) !=-1){
 		switch (opt){
 			case 'a':
 				printf("%s", argv[2]);
@@ -26,9 +26,15 @@ main(int argc, char **argv){
 			case 'd':
 				printf("%s", argv[2]);
 				break;
+			case 'j':
+				printf("%s", argv[2]);
+				break;
+			case 'm':
+				printf("%s", argv[2]);
+				break;
 			case 'p':{
 					 long value = strtol(argv[2], NULL, 10);
-					 Maqrah *m = getmaqrabypage(value);
+					 Maqra *m = getmaqrabypage(value);
 					 Juz *p = juzes[m->parent];
 					 printf("Juz: %d \nMaqra: %d\nPage: %d-%d\n",p->number, m->number, m->start, m->end);
 					 break;
@@ -46,7 +52,7 @@ main(int argc, char **argv){
 
 	for(int i=0;i<SIZE_JUZ;i++){
 		for(int j=0;j<SIZE_MAQRAH;j++){
-			free(juzes[i]->maqrahs[j]);
+			free(juzes[i]->maqras[j]);
 		}
 		free(juzes[i]);
 	}
@@ -54,12 +60,12 @@ main(int argc, char **argv){
 	return EXIT_SUCCESS;
 }
 
-Maqrah *
+Maqra *
 getmaqrabypage(int page){
 	for(int i=0;i<SIZE_JUZ;i++){
 		for(int j=0;j<SIZE_MAQRAH;j++){
-			if(page >= juzes[i]->maqrahs[j]->start && page <= juzes[i]->maqrahs[j]->end) 
-				return juzes[i]->maqrahs[j];
+			if(page >= juzes[i]->maqras[j]->start && page <= juzes[i]->maqras[j]->end) 
+				return juzes[i]->maqras[j];
 		}
 	}
 	return NULL;
@@ -75,12 +81,12 @@ generate(){
 		for(int j=0;j<SIZE_MAQRAH;j++){
 			int end = count <= SIZE_MAQRAH ? (count + 1) : count;
 
-			juzes[i]->maqrahs[j] = malloc(sizeof(*juzes[i]->maqrahs[j]));
+			juzes[i]->maqras[j] = malloc(sizeof(*juzes[i]->maqras[j]));
 
-			juzes[i]->maqrahs[j]->parent = i;
-			juzes[i]->maqrahs[j]->number = count+1;
-			juzes[i]->maqrahs[j]->start = pages[count];
-			juzes[i]->maqrahs[j]->end = pages[end];
+			juzes[i]->maqras[j]->parent = i;
+			juzes[i]->maqras[j]->number = count+1;
+			juzes[i]->maqras[j]->start = pages[count];
+			juzes[i]->maqras[j]->end = pages[end];
 
 			count++;
 		}

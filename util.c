@@ -21,6 +21,12 @@ optusage(char opt) {
 		case 'd':
 			msg = "Delete a maqrah";
 			break;
+		case 'j':
+			msg = "Juz information";
+			break;
+		case 'm':
+			msg = "Maqra information";
+			break;
 		case 'p':
 			msg = "Page information";
 			break;

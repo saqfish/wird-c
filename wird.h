@@ -6,13 +6,13 @@ typedef struct {
 	int number;
 	int start;
 	int end;
-} Maqrah;
+} Maqra;
 
 typedef struct {
 	int *pages;
 	int number;
-	Maqrah *maqrahs[SIZE_MAQRAH];
+	Maqra *maqras[SIZE_MAQRAH];
 } Juz;
 
 int generate();
-Maqrah *getmaqrabypage(int page);
+Maqra *getmaqrabypage(int page);
