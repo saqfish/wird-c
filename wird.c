@@ -67,17 +67,15 @@ getmaqrabypage(int page){
 
 int 
 generate(){
-
 	int count = 0;
 	for(int i=0;i<SIZE_JUZ;i++){
 		juzes[i] = malloc(sizeof(*juzes[i]));		
 		if(juzes[i] == NULL) return 0;
 		juzes[i]->number = i+1;
 		for(int j=0;j<SIZE_MAQRAH;j++){
-			int end = count <= 240 ? (count + 1) : count;
+			int end = count <= SIZE_MAQRAH ? (count + 1) : count;
 
-			juzes[i]->maqrahs[j] = malloc(sizeof(Maqrah*));		
-			if(juzes[i]->maqrahs[j] == NULL) return 0;
+			juzes[i]->maqrahs[j] = malloc(sizeof(*juzes[i]->maqrahs[j]));
 
 			juzes[i]->maqrahs[j]->parent = i;
 			juzes[i]->maqrahs[j]->number = count+1;
