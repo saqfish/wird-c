@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "pages.h"
 #include "wird.h"
 #include "util.h"
@@ -14,6 +15,7 @@ int
 main(int argc, char **argv){
 	int opt, t;
 	char *str;
+	pid_t pid;
 	Juz *p;
 	Maqra *m;
 
@@ -30,7 +32,11 @@ main(int argc, char **argv){
 				verbose = 1;
 				break;
 			case 'm': t = MAQRA;
+				str = optarg;
+				break;
 			case 'p': t = PAGE;
+				str = optarg;
+				break;
 			case 'j': t = JUZ;
 				str = optarg;
 				break;
@@ -49,15 +55,15 @@ main(int argc, char **argv){
 	if(chkptr == str)
 		die("Bad input. Maqra must be 1-240");
 
-	if(t == MAQRA) {
-		if(value < 1 || value > 240) 
-			die("Bad input. Maqra must be 1-240");
-		m = getmaqra(value);
-		p = juzes[m->parent];
-	}else if(t == PAGE) {
+	if(t == PAGE) {
 		if(value < 1 || value > 599) 
 			die("Bad input. Page must be 1-599");
 		m = getmaqrabypage(value);
+		p = juzes[m->parent];
+	}else if(t == MAQRA) {
+		if(value < 1 || value > 240) 
+			die("Bad input. Maqra must be 1-240");
+		m = getmaqra(value);
 		p = juzes[m->parent];
 	}else if(t == JUZ){ 
 		if(value < 1 || value > 30) 
@@ -67,8 +73,19 @@ main(int argc, char **argv){
 		m = p->maqras[0];
 	}
 
-	if(verbose){
-		printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+	if(verbose) printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+
+	if(spawn) {
+		if(fork() == 0){
+			char pstr[3];
+			sprintf(pstr, "%d", m->start + offset);
+
+			char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
+
+			execvp(pdfcmd[0], cmd); 
+
+			die("Launch failed");
+		}
 	}
 
 	for(int i=0;i<SIZE_JUZ;i++){
