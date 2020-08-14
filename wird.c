@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "config.h"
@@ -19,13 +20,16 @@ main(int argc, char **argv){
 	Maqra *m;
 	int opt, type, page;
 	char *chkptr, *str;
+	time_t tme = time(NULL);
+	struct tm tstmp;
 
 	opterr = 0;
 
-	while ((opt = getopt(argc,argv, "oiahj:m:p:")) !=-1){
+	while ((opt = getopt(argc,argv, "oihaj:m:p:")) !=-1){
 		switch (opt){
 			case 'a':
 				add = 1;
+				tstmp = *localtime(&tme);
 				break;
 			case 'o':
 				spawn = 1;
@@ -57,7 +61,7 @@ main(int argc, char **argv){
 		long value = strtol(str, &chkptr, 10);
 
 		if(chkptr == str)
-			die("Bad input. Maqra must be 1-240");
+			die("Bad input.");
 
 		if(type == PAGE) {
 			if(value < 1 || value > 599) 
@@ -72,9 +76,9 @@ main(int argc, char **argv){
 			p = juzes[m->parent];
 			if(add){
 				m->status= 1;
-				m->date[0] = 8;
-				m->date[1] = 13;
-				m->date[2] = 20;
+				m->date[0] = tstmp.tm_mon;
+				m->date[1] = tstmp.tm_mday;
+				m->date[2] = tstmp.tm_year;
 			}
 			if(m->status) printf("Status: %d\nDate: %d/%d/%d\n",m->status, m->date[0],m->date[1],m->date[2]); 
 		}else if(type == JUZ){ 
