@@ -75,10 +75,10 @@ main(int argc, char **argv){
 			m = getmaqra(value);
 			p = juzes[m->parent];
 			if(add){
-				m->status= 1;
+				m->status = 1;
 				m->date[0] = tstmp.tm_mon;
 				m->date[1] = tstmp.tm_mday;
-				m->date[2] = tstmp.tm_year;
+				m->date[2] = tstmp.tm_year + 1900;
 			}
 			if(m->status) printf("Status: %d\nDate: %d/%d/%d\n",m->status, m->date[0],m->date[1],m->date[2]); 
 		}else if(type == JUZ){ 
