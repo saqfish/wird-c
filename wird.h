@@ -29,3 +29,5 @@ int writedb();
 
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);
+
+void freendie(char *);

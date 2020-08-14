@@ -55,7 +55,7 @@ main(int argc, char **argv){
 	}
 
 	if(!generate()) die("Error generating");
-	if(!readdb()) die("Couldn't read db");
+	if(!readdb()) freendie("Couldn't read db");
 
 	if (type){
 
@@ -63,13 +63,13 @@ main(int argc, char **argv){
 
 		if(type == PAGE) {
 			if(value < 1 || value > 599) 
-				die("Bad input. Page must be 1-599");
+				freendie("Bad input. Page must be 1-599");
 			page = value;
 			m = getmaqrabypage(page);
 			p = juzes[m->parent];
 		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
-				die("Bad input. Maqra must be 1-240");
+				freendie("Bad input. Maqra must be 1-240");
 			m = getmaqra(value);
 			p = juzes[m->parent];
 			if(add){
@@ -81,7 +81,7 @@ main(int argc, char **argv){
 			if(m->status) printf("Status: %d\nDate: %d/%d/%d\n",m->status, m->date[0],m->date[1],m->date[2]); 
 		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
-				die("Bad input. Juz must be 1-30");
+				freendie("Bad input. Juz must be 1-30");
 			long indx = value-1;
 			p = juzes[indx];
 			m = p->maqras[0];
@@ -101,11 +101,11 @@ main(int argc, char **argv){
 
 				execvp(pdfcmd[0], cmd); 
 
-				die("Launch failed");
+				freendie("Launch failed");
 			}
 		}
 
-		if(add) if(!writedb()) die("Couldn't write to db");
+		if(add) if(!writedb()) freendie("Couldn't write to db");
 
 	}else {
 		for(int i=0;i<SIZE_JUZ;i++){
@@ -118,13 +118,7 @@ main(int argc, char **argv){
 			}
 		}
 	}
-
-	for(int i=0;i<SIZE_JUZ;i++){
-		for(int j=0;j<SIZE_MAQRA;j++){
-			free(juzes[i]->maqras[j]);
-		}
-		free(juzes[i]);
-	}
+	freendie("");
 	return EXIT_SUCCESS;
 }
 
@@ -242,4 +236,15 @@ writedb(){
 		}
 	fclose(fd);
 	return 1;
+}
+
+void
+freendie(char *str){
+	for(int i=0;i<SIZE_JUZ;i++){
+		for(int j=0;j<SIZE_MAQRA;j++){
+			free(juzes[i]->maqras[j]);
+		}
+		free(juzes[i]);
+	}
+	die(str);
 }
