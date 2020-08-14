@@ -23,6 +23,7 @@ main(int argc, char **argv){
 	time_t tme = time(NULL);
 	struct tm tstmp;
 
+	type = 0;
 	opterr = 0;
 
 	while ((opt = getopt(argc,argv, "oihaj:m:p:")) !=-1){
@@ -53,15 +54,12 @@ main(int argc, char **argv){
 		}
 	}
 
+	if(!generate()) die("Error generating");
+	if(!readdb()) die("Couldn't read db");
+
 	if (type){
 
-		if(!generate()) die("Error generating mushaf");
-		if(!readdb()) die("Couldn't read db");
-
 		long value = strtol(str, &chkptr, 10);
-
-		if(chkptr == str)
-			die("Bad input.");
 
 		if(type == PAGE) {
 			if(value < 1 || value > 599) 
@@ -107,16 +105,26 @@ main(int argc, char **argv){
 			}
 		}
 
-		if(add) if(!writedb()) die("Couldn't read db");
+		if(add) if(!writedb()) die("Couldn't write to db");
 
+	}else {
 		for(int i=0;i<SIZE_JUZ;i++){
+			Juz *p = juzes[i];
 			for(int j=0;j<SIZE_MAQRA;j++){
-				free(juzes[i]->maqras[j]);
+				Maqra *m = p->maqras[j];
+				if(m->status){
+					printf("#%d: %d/%d/%d\n",m->number+1, m->date[0],m->date[1],m->date[2]); 
+				}
 			}
-			free(juzes[i]);
 		}
-	}else die(usgstr);
+	}
 
+	for(int i=0;i<SIZE_JUZ;i++){
+		for(int j=0;j<SIZE_MAQRA;j++){
+			free(juzes[i]->maqras[j]);
+		}
+		free(juzes[i]);
+	}
 	return EXIT_SUCCESS;
 }
 
