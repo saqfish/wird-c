@@ -8,8 +8,10 @@
 #include "util.h"
 
 Juz *juzes[SIZE_JUZ];
+
 int spawn = 0;
 int verbose = 0;
+int add = 0;
 
 int
 main(int argc, char **argv){
@@ -21,8 +23,11 @@ main(int argc, char **argv){
 	opterr = 0;
 	
 
-	while ((opt = getopt(argc,argv, ":oia:d:j:m:p:h")) !=-1){
+	while ((opt = getopt(argc,argv, ":oiahj:m:p:")) !=-1){
 		switch (opt){
+			case 'a':
+				add = 1;
+				break;
 			case 'o':
 				spawn = 1;
 				break;
@@ -52,7 +57,6 @@ main(int argc, char **argv){
 		if(!generate()) die("Error generating mushaf");
 
 		if(!readdb()) die("Couldn't read db");
-		//if(!addtodb()) die("Couldn't read db");
 
 		char *chkptr;
 		int page;
@@ -73,6 +77,12 @@ main(int argc, char **argv){
 				die("Bad input. Maqra must be 1-240");
 			m = getmaqra(value);
 			p = juzes[m->parent];
+			if(add){
+				m->status= 1;
+				m->date[0] = 8;
+				m->date[1] = 13;
+				m->date[2] = 20;
+			}
 		}else if(t == JUZ){ 
 			if(value < 1 || value > 30) 
 				die("Bad input. Juz must be 1-30");
@@ -82,10 +92,8 @@ main(int argc, char **argv){
 		}
 
 		if(verbose || !spawn) {
-			if(m->status){
 				printf("Status: %d\n", m->status); 
 				printf("Date: %d/%d/%d\n", m->date[0],m->date[0],m->date[2]); 
-			}
 			printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
 		}
 
@@ -102,6 +110,8 @@ main(int argc, char **argv){
 				die("Launch failed");
 			}
 		}
+
+		if(add) if(!addtodb()) die("Couldn't read db");
 
 		for(int i=0;i<SIZE_JUZ;i++){
 			for(int j=0;j<SIZE_MAQRA;j++){
@@ -181,6 +191,7 @@ readdb(){
 		juzes[jindx]->maqras[mindx]->date[0] = mon;
 		juzes[jindx]->maqras[mindx]->date[1] = day;
 		juzes[jindx]->maqras[mindx]->date[2] = yr;
+
 	}
 	fclose(fd);
 	return 1;
@@ -189,15 +200,16 @@ int
 addtodb(){
 	FILE *fd;
 	int maqra, mon, day, yr, status;
-	fd = fopen("db", "r+");
+	fd = fopen("db", "w+");
 	if(fd == NULL) return 0;
 
 	
 	for(int i=0;i<SIZE_JUZ;i++)
 		for(int j=0;j<SIZE_MAQRA;j++){
-			fprintf(fd, "%d:%d/%d/%d\n", juzes[i]->maqras[j]->number, 111,222,333);
+			fprintf(fd, "%d:%d/%d/%d:%d\n", juzes[i]->maqras[j]->number - 1, juzes[i]->maqras[j]->date[0], juzes[i]->maqras[j]->date[1], juzes[i]->maqras[j]->date[2], juzes[i]->maqras[j]->status);
 		}
 	fclose(fd);
+
 	return 1;
 
 }
