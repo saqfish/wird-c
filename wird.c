@@ -15,13 +15,12 @@ int add = 0;
 
 int
 main(int argc, char **argv){
-	int opt, t;
-	char *str;
 	Juz *p;
 	Maqra *m;
+	int opt, type, page;
+	char *chkptr, *str;
 
 	opterr = 0;
-	
 
 	while ((opt = getopt(argc,argv, ":oiahj:m:p:")) !=-1){
 		switch (opt){
@@ -34,13 +33,13 @@ main(int argc, char **argv){
 			case 'i':
 				verbose = 1;
 				break;
-			case 'm': t = MAQRA;
+			case 'm': type = MAQRA;
 				  str = optarg;
 				  break;
-			case 'p': t = PAGE;
+			case 'p': type = PAGE;
 				  str = optarg;
 				  break;
-			case 'j': t = JUZ;
+			case 'j': type = JUZ;
 				  str = optarg;
 				  break;
 			case 'h': 
@@ -53,26 +52,23 @@ main(int argc, char **argv){
 		}
 	}
 
-	if (t){
-		if(!generate()) die("Error generating mushaf");
+	if (type){
 
+		if(!generate()) die("Error generating mushaf");
 		if(!readdb()) die("Couldn't read db");
 
-		char *chkptr;
-		int page;
 		long value = strtol(str, &chkptr, 10);
-
 
 		if(chkptr == str)
 			die("Bad input. Maqra must be 1-240");
 
-		if(t == PAGE) {
+		if(type == PAGE) {
 			if(value < 1 || value > 599) 
 				die("Bad input. Page must be 1-599");
 			page = value;
 			m = getmaqrabypage(page);
 			p = juzes[m->parent];
-		}else if(t == MAQRA) {
+		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
 				die("Bad input. Maqra must be 1-240");
 			m = getmaqra(value);
@@ -83,7 +79,8 @@ main(int argc, char **argv){
 				m->date[1] = 13;
 				m->date[2] = 20;
 			}
-		}else if(t == JUZ){ 
+			if(m->status) printf("Status: %d\nDate: %d/%d/%d\n",m->status, m->date[0],m->date[1],m->date[2]); 
+		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
 				die("Bad input. Juz must be 1-30");
 			long indx = value-1;
@@ -92,15 +89,13 @@ main(int argc, char **argv){
 		}
 
 		if(verbose || !spawn) {
-				printf("Status: %d\n", m->status); 
-				printf("Date: %d/%d/%d\n", m->date[0],m->date[0],m->date[2]); 
-			printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+			printf("Juz #%d Maqra #%d Page %d-%d\n", p->number+1, m->number+1, m->start,m->end); 
 		}
 
 		if(spawn) {
 			if(fork() == 0){
 				char pstr[3];
-				int pchk = t == PAGE ? page : m->start;
+				int pchk = type == PAGE ? page : m->start;
 				sprintf(pstr, "%d", pchk + offset);
 
 				char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
@@ -111,7 +106,7 @@ main(int argc, char **argv){
 			}
 		}
 
-		if(add) if(!addtodb()) die("Couldn't read db");
+		if(add) if(!writedb()) die("Couldn't read db");
 
 		for(int i=0;i<SIZE_JUZ;i++){
 			for(int j=0;j<SIZE_MAQRA;j++){
@@ -123,93 +118,117 @@ main(int argc, char **argv){
 
 	return EXIT_SUCCESS;
 }
+
 Maqra *
 getmaqra(int maqra){
-	int count = 0;
-	for(int i=0;i<SIZE_JUZ;i++)
-		for(int j=0;j<SIZE_MAQRA;j++){
-			if(count == (maqra-1)) 
-				return juzes[i]->maqras[j];
-			count++;
-		}
+	Juz *p;
+	Maqra *m;
+	int jindx, mindx;
+
+	int mzero = maqra-1;
+
+	jindx = (int) mzero / SIZE_MAQRA;
+	mindx = mzero % SIZE_MAQRA;
+	p = juzes[jindx];
+	m = p->maqras[mindx];
+
+	if(m->number == mzero) return m;
+
 	return NULL;
 }
 
 Maqra *
 getmaqrabypage(int page){
-	for(int i=0;i<SIZE_JUZ;i++){
-		for(int j=0;j<SIZE_MAQRA;j++){
-			if(page >= juzes[i]->maqras[j]->start && page <= juzes[i]->maqras[j]->end) 
-				return juzes[i]->maqras[j];
-		}
+	Juz *p;
+	Maqra *m;
+	int jindx;
+
+	jindx = (int) page / 20;
+	p = juzes[jindx];
+
+	for(int j=0;j<SIZE_MAQRA;j++){
+		m = p->maqras[j];
+		if(page >= m->start && page <= m->end) 
+			return m;
 	}
 	return NULL;
 }
 
 int 
 generate(){
+	Juz *p;
+	Maqra *m;
 	int count = 0;
+
 	for(int i=0;i<SIZE_JUZ;i++){
 		juzes[i] = malloc(sizeof(*juzes[i]));		
 		if(juzes[i] == NULL) return 0;
-		juzes[i]->number = i+1;
+
+		p = juzes[i];
+		p->number=i;
+
 		for(int j=0;j<SIZE_MAQRA;j++){
 			int end = count <= SIZE_MAQRAS ? (count + 1) : count;
 
 			juzes[i]->maqras[j] = malloc(sizeof(*juzes[i]->maqras[j]));
 
-			juzes[i]->maqras[j]->parent = i;
-			juzes[i]->maqras[j]->number = count+1;
-			juzes[i]->maqras[j]->start = pages[count];
-			juzes[i]->maqras[j]->end = pages[end];
-
+			m = p->maqras[j];
+			m->parent = p->number;
+			m->number = count;
+			m->start = pages[count];
+			m->end = pages[end];
 			count++;
 		}
 	}
-
-
-
 	return 1;
 }
 
 int
 readdb(){
 	FILE *fd;
+	Juz *p;
+	Maqra *m;
 	int maqra, mon, day, yr, status;
-	fd = fopen("db", "r+");
+
+	fd = fopen(dbfile, "r+");
 	if(fd == NULL) return 0;
 
 	while(!feof(fd)){
 		int chk, jindx, mindx;
 		chk=fscanf(fd, "%d:%d/%d/%d:%d", &maqra, &mon, &day, &yr, &status);
+
 		if(chk!=5) break;
 
-		jindx = (int) maqra / 8;
-		mindx = maqra % 8;
-		
-		juzes[jindx]->maqras[mindx]->status = status;
-		juzes[jindx]->maqras[mindx]->date[0] = mon;
-		juzes[jindx]->maqras[mindx]->date[1] = day;
-		juzes[jindx]->maqras[mindx]->date[2] = yr;
+		jindx = (int) maqra / SIZE_MAQRA;
+		mindx = maqra % SIZE_MAQRA;
+		p = juzes[jindx];
+		m = p->maqras[mindx];
 
+		m->status = status;
+		m->date[0] = mon;
+		m->date[1] = day;
+		m->date[2] = yr;
 	}
 	fclose(fd);
 	return 1;
 }
+
 int
-addtodb(){
+writedb(){
 	FILE *fd;
+	Juz *p;
+	Maqra *m;
 	int maqra, mon, day, yr, status;
-	fd = fopen("db", "w+");
+
+	fd = fopen(dbfile, "w+");
 	if(fd == NULL) return 0;
 
-	
 	for(int i=0;i<SIZE_JUZ;i++)
 		for(int j=0;j<SIZE_MAQRA;j++){
-			fprintf(fd, "%d:%d/%d/%d:%d\n", juzes[i]->maqras[j]->number - 1, juzes[i]->maqras[j]->date[0], juzes[i]->maqras[j]->date[1], juzes[i]->maqras[j]->date[2], juzes[i]->maqras[j]->status);
+			p = juzes[i];
+			m = p->maqras[j];
+			fprintf(fd, "%d:%d/%d/%d:%d\n", m->number, m->date[0], m->date[1], m->date[2], m->status);
 		}
 	fclose(fd);
-
 	return 1;
-
 }

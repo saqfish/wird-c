@@ -25,7 +25,7 @@ enum type {
 
 int generate();
 int readdb();
-int addtodb();
+int writedb();
 
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);
