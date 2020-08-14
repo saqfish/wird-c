@@ -7,28 +7,6 @@
 #include "util.h"
 
 void
-usage(){
-	die(usgstr);
-}
-
-void
-optusage(char opt) {
-	char *msg;
-	switch (opt){
-		case 'j':
-			msg = "number: set juz";
-			break;
-		case 'm':
-			msg = "number: set maqra";
-			break;
-		case 'p':
-			msg = "number: set page";
-			break;
-	}
-	vdie("-%c %s\n",opt, msg);
-}
-
-void
 vdie(char *fmt, ...){
 
 	va_list ap;

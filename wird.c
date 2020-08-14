@@ -22,7 +22,7 @@ main(int argc, char **argv){
 
 	opterr = 0;
 
-	while ((opt = getopt(argc,argv, ":oiahj:m:p:")) !=-1){
+	while ((opt = getopt(argc,argv, "oiahj:m:p:")) !=-1){
 		switch (opt){
 			case 'a':
 				add = 1;
@@ -43,12 +43,9 @@ main(int argc, char **argv){
 				  str = optarg;
 				  break;
 			case 'h': 
-				  usage();
+				  die(hlpstr);
 				  break;
-			default: 
-				  if(opt == '?') 
-					  vdie("Bad argument: -%c\n", optopt);
-				  else optusage(optopt);
+			default: die(usgstr);
 		}
 	}
 
@@ -114,7 +111,7 @@ main(int argc, char **argv){
 			}
 			free(juzes[i]);
 		}
-	}else usage();
+	}else die(usgstr);
 
 	return EXIT_SUCCESS;
 }
