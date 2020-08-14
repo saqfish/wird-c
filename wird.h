@@ -7,6 +7,8 @@ typedef struct {
 	int number;
 	int start;
 	int end;
+	int status;
+	int date[3];
 } Maqra;
 
 typedef struct {
@@ -22,6 +24,8 @@ enum type {
 };
 
 int generate();
+int readdb();
+int addtodb();
 
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);

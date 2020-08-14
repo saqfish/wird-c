@@ -19,6 +19,7 @@ main(int argc, char **argv){
 	Maqra *m;
 
 	opterr = 0;
+	
 
 	while ((opt = getopt(argc,argv, ":oia:d:j:m:p:h")) !=-1){
 		switch (opt){
@@ -50,6 +51,9 @@ main(int argc, char **argv){
 	if (t){
 		if(!generate()) die("Error generating mushaf");
 
+		if(!readdb()) die("Couldn't read db");
+		//if(!addtodb()) die("Couldn't read db");
+
 		char *chkptr;
 		int page;
 		long value = strtol(str, &chkptr, 10);
@@ -77,7 +81,13 @@ main(int argc, char **argv){
 			m = p->maqras[0];
 		}
 
-		if(verbose || !spawn) printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+		if(verbose || !spawn) {
+			if(m->status){
+				printf("Status: %d\n", m->status); 
+				printf("Date: %d/%d/%d\n", m->date[0],m->date[0],m->date[2]); 
+			}
+			printf("Juz #%d Maqra #%d Page %d-%d\n", p->number, m->number, m->start,m->end); 
+		}
 
 		if(spawn) {
 			if(fork() == 0){
@@ -152,3 +162,42 @@ generate(){
 	return 1;
 }
 
+int
+readdb(){
+	FILE *fd;
+	int maqra, mon, day, yr, status;
+	fd = fopen("db", "r+");
+	if(fd == NULL) return 0;
+
+	while(!feof(fd)){
+		int chk, jindx, mindx;
+		chk=fscanf(fd, "%d:%d/%d/%d:%d", &maqra, &mon, &day, &yr, &status);
+		if(chk!=5) break;
+
+		jindx = (int) maqra / 8;
+		mindx = maqra % 8;
+		
+		juzes[jindx]->maqras[mindx]->status = status;
+		juzes[jindx]->maqras[mindx]->date[0] = mon;
+		juzes[jindx]->maqras[mindx]->date[1] = day;
+		juzes[jindx]->maqras[mindx]->date[2] = yr;
+	}
+	fclose(fd);
+	return 1;
+}
+int
+addtodb(){
+	FILE *fd;
+	int maqra, mon, day, yr, status;
+	fd = fopen("db", "r+");
+	if(fd == NULL) return 0;
+
+	
+	for(int i=0;i<SIZE_JUZ;i++)
+		for(int j=0;j<SIZE_MAQRA;j++){
+			fprintf(fd, "%d:%d/%d/%d\n", juzes[i]->maqras[j]->number, 111,222,333);
+		}
+	fclose(fd);
+	return 1;
+
+}
