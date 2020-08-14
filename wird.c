@@ -153,6 +153,8 @@ getmaqrabypage(int page){
 	int jindx;
 
 	jindx = (int) page / 20;
+	if(jindx>0) jindx--;
+
 	p = juzes[jindx];
 
 	for(int j=0;j<SIZE_MAQRA;j++){
