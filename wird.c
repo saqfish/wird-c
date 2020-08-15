@@ -80,9 +80,9 @@ main(int argc, char **argv){
 				freendie("Bad input. Juz must be 1-30");
 			long indx = value-1;
 			p = juzes[indx];
+			m = p->maqras[0];
 			pjuzes(p);
 		}
-
 
 		if(spawn) {
 			if(fork() == 0){
@@ -236,15 +236,15 @@ void
 pjuzes(Juz *j){
 	for(int i=0;i<SIZE_MAQRA;i++){
 		Maqra *m = j->maqras[i];
-		pmaqra(m);
+		printf("%03d\n", m->number+1); 
 	}
 }
 
 void
 pmaqra(Maqra *m){
 	Juz *p = juzes[m->parent];
-	printf("Maqra #%03d Pages %03d-%03d", m->number+1, m->start,m->end); 
-	if(info) printf(" (juz %02d)", p->number+1); 
+	if(info) printf("J%02d", p->number+1); 
+	printf("M%03dS%03dE%03d", m->number+1, m->start,m->end); 
 	if(m->status) pdate(m);
 	printf("\n");
 }
@@ -263,16 +263,10 @@ pdate(Maqra *m){
 
 	tp = *localtime(&datep);
 
-	printf(" - %02d/%02d/%d",tp.tm_mon, tp.tm_mday,tp.tm_year + 1900); 
-	if(info){
-		if (days) {
-			char *s = days != 1 ? "s ": " ";
-			printf(" (%d day%sago)",days, s); 
-		}else {
-			char *s = hours != 1 ? "s ": " ";
-			printf(" (%d hour%sago)",hours, s); 
-		}
-	}
+	printf("\n%02d%02d%dX%d",tp.tm_mon, tp.tm_mday,tp.tm_year + 1900, m->status); 
+	if(info)
+		if (days) printf("(%dD)",days); 
+		else printf("(%dH)",hours); 
 }
 
 void
@@ -281,11 +275,7 @@ plist(){
 		Juz *p = juzes[i];
 		for(int j=0;j<SIZE_MAQRA;j++){
 			Maqra *m = p->maqras[j];
-			if(m->status){
-				printf("Maqra #%03d",m->number+1); 
-				pdate(m);
-				printf("\n"); 
-			}
+			if(m->status) printf("%03d\n",m->number+1); 
 		}
 	}
 }
