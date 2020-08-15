@@ -63,8 +63,8 @@ main(int argc, char **argv){
 		long value = strtol(str, &chkptr, 10);
 
 		if(type == PAGE) {
-			if(value < 1 || value > 599) 
-				freendie("Bad input. Page must be 1-599");
+			if(value < 1 || value > 604) 
+				freendie("Bad input. Page must be 1-604");
 			page = value;
 			m = getmaqrabypage(page);
 			pmaqra(m);
