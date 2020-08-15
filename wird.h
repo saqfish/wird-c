@@ -8,7 +8,7 @@ typedef struct {
 	int start;
 	int end;
 	int status;
-	int date[3];
+	unsigned long date;
 } Maqra;
 
 typedef struct {
@@ -30,4 +30,9 @@ int writedb();
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);
 
+void ppage(Maqra *, int);
+void pjuzes(Juz *);
+void pmaqra(Maqra *);
+void pdate(Maqra *);
+void plist();
 void freendie(char *);

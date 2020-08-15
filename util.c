@@ -20,6 +20,6 @@ vdie(char *fmt, ...){
 
 void
 die(char *str){
-	fprintf(stderr, "%s\n", str);
+	if(str) fprintf(stderr, "%s\n", str);
 	exit(EXIT_FAILURE);
 }

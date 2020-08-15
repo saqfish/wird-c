@@ -21,7 +21,6 @@ main(int argc, char **argv){
 	int opt, type, page;
 	char *chkptr, *str;
 	time_t tme = time(NULL);
-	struct tm tstmp;
 
 	type = 0;
 	opterr = 0;
@@ -30,7 +29,7 @@ main(int argc, char **argv){
 		switch (opt){
 			case 'a':
 				add = 1;
-				tstmp = *localtime(&tme);
+				tme = time(NULL);		
 				break;
 			case 'o':
 				spawn = 1;
@@ -67,6 +66,7 @@ main(int argc, char **argv){
 			page = value;
 			m = getmaqrabypage(page);
 			p = juzes[m->parent];
+			ppage(m, page);
 		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
 				freendie("Bad input. Maqra must be 1-240");
@@ -74,22 +74,18 @@ main(int argc, char **argv){
 			p = juzes[m->parent];
 			if(add){
 				m->status = 1;
-				m->date[0] = tstmp.tm_mon;
-				m->date[1] = tstmp.tm_mday;
-				m->date[2] = tstmp.tm_year + 1900;
+				m->date = (unsigned long)tme;
 			}
-			if(m->status) printf("Status: %d\nDate: %d/%d/%d\n",m->status, m->date[0],m->date[1],m->date[2]); 
+			pmaqra(m);
+			if(m->status) pdate(m);
 		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
 				freendie("Bad input. Juz must be 1-30");
 			long indx = value-1;
 			p = juzes[indx];
-			m = p->maqras[0];
+			pjuzes(p);
 		}
 
-		if(verbose || !spawn) {
-			printf("Juz #%d Maqra #%d Page %d-%d\n", p->number+1, m->number+1, m->start,m->end); 
-		}
 
 		if(spawn) {
 			if(fork() == 0){
@@ -108,17 +104,9 @@ main(int argc, char **argv){
 		if(add) if(!writedb()) freendie("Couldn't write to db");
 
 	}else {
-		for(int i=0;i<SIZE_JUZ;i++){
-			Juz *p = juzes[i];
-			for(int j=0;j<SIZE_MAQRA;j++){
-				Maqra *m = p->maqras[j];
-				if(m->status){
-					printf("#%d: %d/%d/%d\n",m->number+1, m->date[0],m->date[1],m->date[2]); 
-				}
-			}
-		}
+		plist();
 	}
-	freendie("");
+	freendie(NULL);
 	return EXIT_SUCCESS;
 }
 
@@ -193,16 +181,17 @@ readdb(){
 	FILE *fd;
 	Juz *p;
 	Maqra *m;
-	int maqra, mon, day, yr, status;
+	int maqra, status;
+	unsigned long date;
 
 	fd = fopen(dbfile, "r+");
 	if(fd == NULL) return 0;
 
 	while(!feof(fd)){
 		int chk, jindx, mindx;
-		chk=fscanf(fd, "%d:%d/%d/%d:%d", &maqra, &mon, &day, &yr, &status);
+		chk=fscanf(fd, "%d:%lu:%d", &maqra, &date, &status);
 
-		if(chk!=5) break;
+		if(chk!=3) break;
 
 		jindx = (int) maqra / SIZE_MAQRA;
 		mindx = maqra % SIZE_MAQRA;
@@ -210,9 +199,7 @@ readdb(){
 		m = p->maqras[mindx];
 
 		m->status = status;
-		m->date[0] = mon;
-		m->date[1] = day;
-		m->date[2] = yr;
+		m->date = date;
 	}
 	fclose(fd);
 	return 1;
@@ -223,7 +210,6 @@ writedb(){
 	FILE *fd;
 	Juz *p;
 	Maqra *m;
-	int maqra, mon, day, yr, status;
 
 	fd = fopen(dbfile, "w+");
 	if(fd == NULL) return 0;
@@ -232,7 +218,7 @@ writedb(){
 		for(int j=0;j<SIZE_MAQRA;j++){
 			p = juzes[i];
 			m = p->maqras[j];
-			fprintf(fd, "%d:%d/%d/%d:%d\n", m->number, m->date[0], m->date[1], m->date[2], m->status);
+			fprintf(fd, "%d:%lu:%d\n", m->number, m->date, m->status);
 		}
 	fclose(fd);
 	return 1;
@@ -247,4 +233,51 @@ freendie(char *str){
 		free(juzes[i]);
 	}
 	die(str);
+}
+
+void
+ppage(Maqra *m, int page){
+	printf("Page %03d: \n", page); 
+	pmaqra(m);
+	if(m->status) pdate(m);
+}
+
+void
+pjuzes(Juz *j){
+	printf("Juz %02d: \n", j->number+1); 
+	for(int i=0;i<SIZE_MAQRA;i++){
+		Maqra *m = j->maqras[i];
+		printf("Maqra #%03d (pages %03d-%03d) ", m->number+1, m->start,m->end); 
+		if(m->status) pdate(m);
+		else printf("\n");
+	}
+}
+
+void
+pmaqra(Maqra *m){
+	Juz *p = juzes[m->parent];
+	printf("Maqra #%03d (juz %02d) Pages %03d-%03d\n", m->number+1, p->number+1, m->start,m->end); 
+}
+
+void
+pdate(Maqra *m){
+	struct tm t;
+	time_t date = m->date;
+	t = *localtime(&date);
+	printf("Completed: %d/%d/%d\n",t.tm_mon, t.tm_mday,t.tm_year + 1900); 
+}
+
+void
+plist(){
+
+	for(int i=0;i<SIZE_JUZ;i++){
+		Juz *p = juzes[i];
+		for(int j=0;j<SIZE_MAQRA;j++){
+			Maqra *m = p->maqras[j];
+			if(m->status){
+				printf("Maqra #%d ",m->number+1); 
+				pdate(m);
+			}
+		}
+	}
 }
