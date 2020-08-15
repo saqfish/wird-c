@@ -9,10 +9,12 @@
 #include "util.h"
 
 Juz *juzes[SIZE_JUZ];
+Maqra *wird[8];
 
 int spawn = 0;
 int info = 0;
 int add = 0;
+int wirdms = 0;
 
 int
 main(int argc, char **argv){
@@ -71,7 +73,7 @@ main(int argc, char **argv){
 				freendie("Bad input. Maqra must be 1-240");
 			m = getmaqra(value);
 			if(add){
-				m->status = 1;
+				m->status++;
 				m->date = (unsigned long)tme;
 			}
 			pmaqra(m);
@@ -197,6 +199,7 @@ readdb(){
 
 		m->status = status;
 		m->date = date;
+		if(status) addtowird(m);
 	}
 	fclose(fd);
 	return 1;
@@ -254,7 +257,7 @@ pdate(Maqra *m){
 	struct tm tp;
 	time_t datep, datec;
 
-        datep = m->date;
+	datep = m->date;
 	time(&datec); 
 
 	double tdiff = difftime(datec, datep);
@@ -263,7 +266,7 @@ pdate(Maqra *m){
 
 	tp = *localtime(&datep);
 
-	printf("\n%02d%02d%dX%d",tp.tm_mon, tp.tm_mday,tp.tm_year + 1900, m->status); 
+	printf("\n%02d%02d%dX%d",tp.tm_mon+1, tp.tm_mday,tp.tm_year + 1900, m->status); 
 	if(info)
 		if (days) printf("(%dD)",days); 
 		else printf("(%dH)",hours); 
@@ -271,11 +274,38 @@ pdate(Maqra *m){
 
 void
 plist(){
-	for(int i=0;i<SIZE_JUZ;i++){
-		Juz *p = juzes[i];
-		for(int j=0;j<SIZE_MAQRA;j++){
-			Maqra *m = p->maqras[j];
-			if(m->status) printf("%03d\n",m->number+1); 
-		}
+	sortstatus();
+	sortdates();
+
+	for(int i=0;i<wirdms;i++){
+		printf("%03d %d %d\n",wird[i]->number+1,wird[i]->status,wird[i]->date); 
 	}
+}
+
+void swap(int i1, int i2) 
+{ 
+	Maqra *temp = wird[i1]; 
+	wird[i1] = wird[i2]; 
+	wird[i2] = temp; 
+} 
+
+void sortstatus() 
+{ 
+	for (int i = 0; i < wirdms-1; i++)       
+		for (int j = 0; j < wirdms-i-1; j++)  
+			if (wird[j]->status > wird[j+1]->status) 
+				swap(j, j+1); 
+} 
+
+void sortdates() 
+{ 
+	for (int i = 0; i < wirdms-1; i++)       
+		for (int j = 0; j < wirdms-i-1; j++)  
+			if (wird[j]->status > 3 && wird[j]->date > wird[j+1]->date) 
+				swap(j, j+1); 
+} 
+int
+addtowird(Maqra *m){
+	wird[wirdms]=m;
+	wirdms++;
 }
