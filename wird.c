@@ -65,19 +65,16 @@ main(int argc, char **argv){
 				freendie("Bad input. Page must be 1-599");
 			page = value;
 			m = getmaqrabypage(page);
-			p = juzes[m->parent];
-			ppage(m, page);
+			pmaqra(m);
 		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
 				freendie("Bad input. Maqra must be 1-240");
 			m = getmaqra(value);
-			p = juzes[m->parent];
 			if(add){
 				m->status = 1;
 				m->date = (unsigned long)tme;
 			}
 			pmaqra(m);
-			if(m->status) pdate(m);
 		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
 				freendie("Bad input. Juz must be 1-30");
@@ -236,27 +233,19 @@ freendie(char *str){
 }
 
 void
-ppage(Maqra *m, int page){
-	printf("Page %03d: \n", page); 
-	pmaqra(m);
-	if(m->status) pdate(m);
-}
-
-void
 pjuzes(Juz *j){
-	printf("Juz %02d: \n", j->number+1); 
 	for(int i=0;i<SIZE_MAQRA;i++){
 		Maqra *m = j->maqras[i];
-		printf("Maqra #%03d (pages %03d-%03d) ", m->number+1, m->start,m->end); 
-		if(m->status) pdate(m);
-		else printf("\n");
+		pmaqra(m);
 	}
 }
 
 void
 pmaqra(Maqra *m){
 	Juz *p = juzes[m->parent];
-	printf("Maqra #%03d (juz %02d) Pages %03d-%03d\n", m->number+1, p->number+1, m->start,m->end); 
+	printf("Maqra #%03d (juz %02d) Pages %03d-%03d", m->number+1, p->number+1, m->start,m->end); 
+	if(m->status) pdate(m);
+	printf("\n");
 }
 
 void
@@ -264,19 +253,19 @@ pdate(Maqra *m){
 	struct tm t;
 	time_t date = m->date;
 	t = *localtime(&date);
-	printf("Completed: %d/%d/%d\n",t.tm_mon, t.tm_mday,t.tm_year + 1900); 
+	printf(" - %d/%d/%d",t.tm_mon, t.tm_mday,t.tm_year + 1900); 
 }
 
 void
 plist(){
-
 	for(int i=0;i<SIZE_JUZ;i++){
 		Juz *p = juzes[i];
 		for(int j=0;j<SIZE_MAQRA;j++){
 			Maqra *m = p->maqras[j];
 			if(m->status){
-				printf("Maqra #%d ",m->number+1); 
+				printf("Maqra #%03d",m->number+1); 
 				pdate(m);
+				printf("\n"); 
 			}
 		}
 	}

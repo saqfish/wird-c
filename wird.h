@@ -30,7 +30,6 @@ int writedb();
 Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);
 
-void ppage(Maqra *, int);
 void pjuzes(Juz *);
 void pmaqra(Maqra *);
 void pdate(Maqra *);
