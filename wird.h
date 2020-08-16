@@ -31,8 +31,8 @@ Maqra *getmaqrabypage(int);
 Maqra *getmaqra(int);
 
 void pjuzes(Juz *);
-void pmaqra(Maqra *);
-void pdate(Maqra *);
+char * pmaqra(Maqra *);
+char *pdate(Maqra *);
 void plist();
 int cmpms(const void *, const void *); 
 

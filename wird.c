@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -11,6 +12,7 @@
 Juz *juzes[SIZE_JUZ];
 Maqra wird[8];
 
+char *rstr;
 int spawn = 0;
 int info = 0;
 int add = 0;
@@ -67,7 +69,8 @@ main(int argc, char **argv){
 				freendie("Bad input. Page must be 1-604");
 			page = value;
 			m = getmaqrabypage(page);
-			pmaqra(m);
+			rstr = pmaqra(m);
+			printf("%s\n", rstr);
 		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
 				freendie("Bad input. Maqra must be 1-240");
@@ -76,7 +79,8 @@ main(int argc, char **argv){
 				m->status++;
 				m->date = (unsigned long)tme;
 			}
-			pmaqra(m);
+			rstr = pmaqra(m);
+			printf("%s\n", rstr);
 		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
 				freendie("Bad input. Juz must be 1-30");
@@ -85,6 +89,7 @@ main(int argc, char **argv){
 			m = p->maqras[0];
 			pjuzes(p);
 		}
+
 
 		if(spawn) {
 			if(fork() == 0){
@@ -233,51 +238,70 @@ freendie(char *str){
 		}
 		free(juzes[i]);
 	}
+	free(rstr);
 	die(str);
 }
 
 void
 pjuzes(Juz *j){
 	for(int i=0;i<SIZE_MAQRA;i++){
+		char *str;
+
 		Maqra *m = j->maqras[i];
-		printf("%03d\n", m->number+1); 
+		str = pmaqra(m);
+
+		printf("%s\n", str);
+		free(str);
 	}
 }
 
-void
+char *
 pmaqra(Maqra *m){
+	char *str, *tstr;
+	int limit = 13;
+
 	Juz *p = juzes[m->parent];
-	if(info) printf("J%02d", p->number+1); 
-	printf("M%03dS%03dE%03d", m->number+1, m->start,m->end); 
-	if(m->status) pdate(m);
-	printf("\n");
+
+	if(info) limit+=3; 
+
+	str = malloc(limit * sizeof(char));
+	snprintf(str, limit, "M%03dS%03dE%03dJ%02d", m->number+1, m->start, m->end, p->number+1); 
+
+	if(m->status){
+		tstr = pdate(m);
+		str = realloc(str, (limit+sizeof(tstr) * sizeof(char)));
+		strcat(str, tstr);
+		free(tstr);
+	}
+	return str;
 }
 
-void
+char *
 pdate(Maqra *m){
-	struct tm tp;
+	char *tstr = malloc(20*sizeof(char));
 	time_t datep, datec;
 
 	datep = m->date;
 	time(&datec); 
 
-	double tdiff = difftime(datec, datep);
-	int days = (int) tdiff / 86400;
-	int hours = (int) tdiff / 3600;
-
-	tp = *localtime(&datep);
-
-	printf("\n%02d%02d%dX%d",tp.tm_mon+1, tp.tm_mday,tp.tm_year + 1900, m->status); 
-	if(info)
-		if (days) printf("(%dD)",days); 
-		else printf("(%dH)",hours); 
+	int tdiff = difftime(datec, datep);
+	// int days = (int) tdiff / 86400;
+	// int hours = (int) tdiff / 3600;
+	snprintf(tstr, 100, "X%d" ,tdiff);
+	return tstr;
 }
 
 void
 plist(){
 	qsort(wird, wirdms, sizeof(Maqra), cmpms);
 	for(int i=0;i<wirdms;i++){
-		printf("%03d %d %d\n",wird[i].number+1,wird[i].status,wird[i].date); 
+		char *str;
+
+		Maqra m = wird[i];
+		str = pmaqra(&m);
+
+		printf("%s\n", str);
+		free(str);
 	}
 }
 
