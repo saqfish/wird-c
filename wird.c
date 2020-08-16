@@ -9,7 +9,7 @@
 #include "util.h"
 
 Juz *juzes[SIZE_JUZ];
-Maqra *wird[8];
+Maqra wird[8];
 
 int spawn = 0;
 int info = 0;
@@ -199,7 +199,7 @@ readdb(){
 
 		m->status = status;
 		m->date = date;
-		if(status) addtowird(m);
+		if(status) wird[wirdms++]=*m;
 	}
 	fclose(fd);
 	return 1;
@@ -274,38 +274,13 @@ pdate(Maqra *m){
 
 void
 plist(){
-	sortstatus();
-	sortdates();
-
+	qsort(wird, wirdms, sizeof(Maqra), cmpms);
 	for(int i=0;i<wirdms;i++){
-		printf("%03d %d %d\n",wird[i]->number+1,wird[i]->status,wird[i]->date); 
+		printf("%03d %d %d\n",wird[i].number+1,wird[i].status,wird[i].date); 
 	}
 }
 
-void swap(int i1, int i2) 
-{ 
-	Maqra *temp = wird[i1]; 
-	wird[i1] = wird[i2]; 
-	wird[i2] = temp; 
-} 
-
-void sortstatus() 
-{ 
-	for (int i = 0; i < wirdms-1; i++)       
-		for (int j = 0; j < wirdms-i-1; j++)  
-			if (wird[j]->status > wird[j+1]->status) 
-				swap(j, j+1); 
-} 
-
-void sortdates() 
-{ 
-	for (int i = 0; i < wirdms-1; i++)       
-		for (int j = 0; j < wirdms-i-1; j++)  
-			if (wird[j]->status > 3 && wird[j]->date > wird[j+1]->date) 
-				swap(j, j+1); 
-} 
 int
-addtowird(Maqra *m){
-	wird[wirdms]=m;
-	wirdms++;
-}
+cmpms(const void *a, const void *b) {
+	return (((Maqra *)a)->date - ((Maqra *)a)->date);
+} 

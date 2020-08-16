@@ -34,9 +34,6 @@ void pjuzes(Juz *);
 void pmaqra(Maqra *);
 void pdate(Maqra *);
 void plist();
-int addtowird(Maqra *);
-void swap(int, int); 
-void sortstatus(); 
-void sortdates(); 
+int cmpms(const void *, const void *); 
 
 void freendie(char *);
