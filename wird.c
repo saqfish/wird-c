@@ -136,12 +136,13 @@ getmaqrabypage(int page){
 	jindx = (int) page / 20;
 	if(jindx>0) jindx--;
 
-	p = juzes[jindx];
-
-	for(int j=0;j<SIZE_MAQRA;j++){
-		m = p->maqras[j];
-		if(page >= m->start && page <= m->end) 
-			return m;
+	for(int i=jindx;i<SIZE_JUZ;i++){
+		p = juzes[i];
+		for(int j=0;j<SIZE_MAQRA;j++){
+			m = p->maqras[j];
+			if(page >= m->start && page <= m->end)
+				return m;
+		}
 	}
 	return NULL;
 }
