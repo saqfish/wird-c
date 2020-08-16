@@ -11,6 +11,7 @@
 
 Juz *juzes[SIZE_JUZ];
 Maqra wird[8];
+Maqra due[8];
 
 char *rstr;
 int spawn = 0;
@@ -307,5 +308,7 @@ plist(){
 
 int
 cmpms(const void *a, const void *b) {
-	return (((Maqra *)a)->date - ((Maqra *)a)->date);
+	Maqra *ma = (Maqra *)a;
+	Maqra *mb = (Maqra *)b;
+	return (ma->date > mb->date) - (ma->date < mb->date);
 } 
