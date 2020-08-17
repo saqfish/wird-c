@@ -7,6 +7,10 @@
 #define COLOR_RESET   "\x1b[0m"
 
 int raw;
+int info;
 
+void phdr();
+void pftr();
 void prstr(char *);
+void pmul(char* , int);
 void cprintf(char *, char *, ...);

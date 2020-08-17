@@ -15,7 +15,6 @@ Maqra wird[240];
 
 char *rstr;
 int spawn = 0;
-int info = 0;
 int add = 0;
 
 int wirdms = 0;
@@ -64,6 +63,8 @@ main(int argc, char **argv){
 
 	if(!generate()) die("Error generating");
 	if(!readdb()) freendie("Couldn't read db");
+
+	phdr();
 
 	if (type){
 
@@ -116,6 +117,7 @@ main(int argc, char **argv){
 	}else {
 		plist();
 	}
+	pftr();
 	freendie(NULL);
 	return EXIT_SUCCESS;
 }
