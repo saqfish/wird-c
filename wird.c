@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "pages.h"
+#include "print.h"
 #include "wird.h"
 #include "util.h"
 
@@ -16,6 +17,7 @@ char *rstr;
 int spawn = 0;
 int info = 0;
 int add = 0;
+
 int wirdms = 0;
 
 int
@@ -29,7 +31,7 @@ main(int argc, char **argv){
 	type = 0;
 	opterr = 0;
 
-	while ((opt = getopt(argc,argv, "oihaj:m:p:")) !=-1){
+	while ((opt = getopt(argc,argv, "oihraj:m:p:")) !=-1){
 		switch (opt){
 			case 'a':
 				add = 1;
@@ -40,6 +42,9 @@ main(int argc, char **argv){
 				break;
 			case 'i':
 				info = 1;
+				break;
+			case 'r':
+				raw = 1;
 				break;
 			case 'm': type = MAQRA;
 				  str = optarg;
@@ -70,17 +75,18 @@ main(int argc, char **argv){
 			page = value;
 			m = getmaqrabypage(page);
 			rstr = pmaqra(m);
-			printf("%s\n", rstr);
+			prstr(rstr);
 		}else if(type == MAQRA) {
 			if(value < 1 || value > 240) 
 				freendie("Bad input. Maqra must be 1-240");
+
 			m = getmaqra(value);
 			if(add){
 				m->status++;
 				m->date = (unsigned long)tme;
 			}
 			rstr = pmaqra(m);
-			printf("%s\n", rstr);
+			prstr(rstr);
 		}else if(type == JUZ){ 
 			if(value < 1 || value > 30) 
 				freendie("Bad input. Juz must be 1-30");
@@ -250,7 +256,7 @@ pjuzes(Juz *j){
 		Maqra *m = j->maqras[i];
 		str = pmaqra(m);
 
-		printf("%s\n", str);
+		prstr(str);
 		free(str);
 	}
 }
@@ -258,14 +264,13 @@ pjuzes(Juz *j){
 char *
 pmaqra(Maqra *m){
 	char *str, *tstr;
-	int limit = 13;
+	int limit = 16;
 
 	Juz *p = juzes[m->parent];
 
-	if(info) limit+=3; 
-
 	str = malloc(limit * sizeof(char));
 	snprintf(str, limit, "M%03dS%03dE%03dJ%02d", m->number+1, m->start, m->end, p->number+1); 
+
 
 	if(m->status){
 		tstr = pdate(m);
@@ -294,14 +299,14 @@ pdate(Maqra *m){
 void
 plist(){
 	qsort(wird, wirdms, sizeof(Maqra), cmpms);
-	int min = wirdms < 8 ? 1 : wirdms / 30; 
+	int min = wirdms < 8 ? 8 : wirdms / 30; 
 	for(int i=0;i<wirdms && i<min;i++){
 		char *str;
 
 		Maqra m = wird[i];
 		str = pmaqra(&m);
 
-		printf("%s\n", str);
+		prstr(str);
 		free(str);
 	}
 }
