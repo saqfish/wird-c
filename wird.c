@@ -10,8 +10,7 @@
 #include "util.h"
 
 Juz *juzes[SIZE_JUZ];
-Maqra wird[8];
-Maqra due[8];
+Maqra wird[240];
 
 char *rstr;
 int spawn = 0;
@@ -295,7 +294,8 @@ pdate(Maqra *m){
 void
 plist(){
 	qsort(wird, wirdms, sizeof(Maqra), cmpms);
-	for(int i=0;i<wirdms;i++){
+	int min = wirdms < 8 ? 1 : wirdms / 30; 
+	for(int i=0;i<wirdms && i<min;i++){
 		char *str;
 
 		Maqra m = wird[i];
