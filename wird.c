@@ -63,8 +63,6 @@ main(int argc, char **argv){
 	if(!generate()) die("Error generating");
 	if(!readdb()) freendie("Couldn't read db");
 
-
-	printf("optind: %d args: %d\n",optind,argc);
 	if(type) value = strtol(str, &chkptr, 10);
 
 	switch (type){
@@ -295,8 +293,6 @@ pdate(Maqra *m){
 	time(&datec); 
 
 	int tdiff = difftime(datec, datep);
-	// int days = (int) tdiff / 86400;
-	// int hours = (int) tdiff / 3600;
 	snprintf(tstr, 100, "X%d" ,tdiff);
 	return tstr;
 }

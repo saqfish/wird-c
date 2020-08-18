@@ -9,7 +9,8 @@
 #define STR_MAQRA "Maqra" 
 #define STR_JUZ "Juz" 
 #define STR_PAGES "Pages" 
-#define STR_STATUS "Status" 
+#define STR_STATUS "Time since" 
+#define STATUS_MAX 10
 
 #define VLINE "─" 
 #define HLINE "│" 
@@ -28,4 +29,5 @@ void phdr();
 void pftr();
 void prstr(char *);
 void pmul(char* , int);
+char *gstatus(int);
 void cprintf(char *, char *, ...);
