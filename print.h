@@ -6,8 +6,23 @@
 #define COLOR_CYAN    "\x1b[36m"
 #define COLOR_RESET   "\x1b[0m"
 
-int raw;
-int info;
+#define STR_MAQRA "Maqra" 
+#define STR_JUZ "Juz" 
+#define STR_PAGES "Pages" 
+#define STR_STATUS "Status" 
+
+#define VLINE "─" 
+#define HLINE "│" 
+#define SPACE " " 
+
+#define HEADER_RTOP_CORNER "┐"
+#define HEADER_RBTM_CORNER "┤"
+#define HEADER_LTOP_CORNER "┌"
+#define HEADER_LBTM_CORNER "├"
+#define FOOTER_RCORNER "┘"
+#define FOOTER_LCORNER "└"
+
+int raw, jflag, pflag, sflag;
 
 void phdr();
 void pftr();

@@ -40,7 +40,8 @@ main(int argc, char **argv){
 				spawn = 1;
 				break;
 			case 'i':
-				info = 1;
+				pflag = 1;
+				sflag = 1;
 				break;
 			case 'r':
 				raw = 1;
@@ -52,6 +53,7 @@ main(int argc, char **argv){
 				  str = optarg;
 				  break;
 			case 'j': type = JUZ;
+				  jflag = 1;
 				  str = optarg;
 				  break;
 			case 'h': 

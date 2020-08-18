@@ -1,88 +1,92 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "print.h"
 
-#define STR_MAQRA "Maqra" 
-#define STR_JUZ "Juz" 
-#define STR_PAGES "Pages" 
-
-
-#define WIDTH 7
-#define WIDTH_INFO 31
-
-#define VLINE "─" 
-#define HLINE "│" 
-#define SPACE " " 
-
-#define HEADER_RTOP_CORNER "┐"
-#define HEADER_RBTM_CORNER "┤"
-#define HEADER_LTOP_CORNER "┌"
-#define HEADER_LBTM_CORNER "├"
-#define FOOTER_RCORNER "┘"
-#define FOOTER_LCORNER "└"
-
-int lens = strlen(STR_JUZ) + strlen(STR_MAQRA) + strlen(STR_PAGES);
+int width;
 
 void
 phdr(){
-	int max = info ? WIDTH_INFO: WIDTH;
-	int padding = 9;
-	int nmax = max - lens -padding;
+	int mlen, jlen, plen, slen;
+	int spacing;
+
+	spacing = 2;
+
+	mlen = strlen(STR_MAQRA) + spacing;
+	width+= mlen;
+
+	if(jflag) {
+		jlen = strlen(STR_JUZ) + spacing;
+		width+= jlen;
+		width++;
+	}
+
+	if(pflag) {
+		plen = strlen(STR_PAGES) < 7 ? 7 : strlen(STR_PAGES);
+		plen+= spacing;
+		width+= plen;
+		width++;
+	}
+
+	if(sflag) {
+		slen = strlen(STR_STATUS) + spacing;
+		width+= slen;
+		width++;
+	}
 
 	printf("%s", HEADER_LTOP_CORNER);
-	pmul(VLINE,max);
+	pmul(VLINE,width);
 	printf("%s\n", HEADER_RTOP_CORNER);
 
-	printf("%s %s %s",HLINE ,STR_MAQRA, HLINE);
-	if (info) {
-
-		printf(" %s %s %s ", STR_JUZ, HLINE, STR_PAGES);
-		pmul(SPACE,nmax);
-		printf(" %s\n",HLINE);
-	} else printf("\n");
+	printf("%s %s %s ",HLINE ,STR_MAQRA, HLINE);
+	if (jflag) printf("%s %s ", STR_JUZ, HLINE);
+	if (pflag) printf("%-*s %s ", 7, STR_PAGES, HLINE);
+	if (sflag) printf("%s %s ", STR_STATUS, HLINE);
+	printf("\n");
 
 
 	printf("%s",HEADER_LBTM_CORNER);
-	pmul(VLINE,max);
+	pmul(VLINE,width);
 	printf("%s\n",HEADER_RBTM_CORNER);
 }
 
 void
 pftr(){
-	int max = info ? WIDTH_INFO: WIDTH;
 	printf("%s", FOOTER_LCORNER);
-	pmul(VLINE,max);
+	pmul(VLINE,width);
 	printf("%s\n", FOOTER_RCORNER);
 }
+
 void 
 prstr(char *rstr){
 	int m,s,e,j,x;
-	int nlen;
-
-	int nmax, padding;
+	char *mclr;
 
 	if(raw) printf("%s", rstr);
 	else{
+		mclr = COLOR_RESET;
+
 		sscanf(rstr, "M%03dS%03dE%03dJ%02dX%d", &m,&s,&e,&j,&x);
-		printf("%s",HLINE);
-		cprintf(COLOR_YELLOW, " %03d ", m);
-		// if (strlen(rstr) > 16) cprintf(COLOR_BLUE, " %03d", x);
-		nlen = strlen(STR_MAQRA)-3;
-		pmul(SPACE,nlen);
-		printf("%s",HLINE);
-		if(info) {
 
+		if (strlen(rstr) > 15) mclr = COLOR_GREEN;
+
+		printf("%s",HLINE);
+		cprintf(mclr, " %03d ", m);
+
+		pmul(SPACE, strlen(STR_MAQRA)-3);
+		printf("%s",HLINE);
+
+		if(jflag) {
 			cprintf(COLOR_YELLOW, " %02d ", j);
-
-			nlen = strlen(STR_JUZ)-2;
-			pmul(SPACE,nlen);
-			printf("%s",HLINE);
-
+			printf(" %s",HLINE);
+		} 
+		if(pflag) {
 			cprintf(COLOR_YELLOW, " %03d-%03d ",s,e);
-			
-			nmax = (lens - strlen(STR_PAGES));
-			pmul(SPACE,nmax);
+			printf("%s",HLINE);
+		} 
+		if(sflag) {
+			printf(" %s ", STR_STATUS);
 			printf("%s",HLINE);
 		} 
 	}
