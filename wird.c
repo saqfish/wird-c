@@ -14,20 +14,17 @@ Juz *juzes[SIZE_JUZ];
 Maqra wird[240];
 
 char *rstr;
-int spawn = 0;
-int add = 0;
-
-int wirdms = 0;
+int spawn, add, wirdms;
 
 int
 main(int argc, char **argv){
 	Juz *p;
 	Maqra *m;
 	int opt, type, page;
+	long value;
 	char *chkptr, *str;
 	time_t tme = time(NULL);
 
-	type = 0;
 	opterr = 0;
 
 	while ((opt = getopt(argc,argv, "oihraj:m:p:")) !=-1){
@@ -40,8 +37,8 @@ main(int argc, char **argv){
 				spawn = 1;
 				break;
 			case 'i':
-				pflag = 1;
 				sflag = 1;
+				pflag = 1;
 				break;
 			case 'r':
 				raw = 1;
@@ -66,60 +63,64 @@ main(int argc, char **argv){
 	if(!generate()) die("Error generating");
 	if(!readdb()) freendie("Couldn't read db");
 
-	phdr();
 
-	if (type){
+	printf("optind: %d args: %d\n",optind,argc);
+	if(type) value = strtol(str, &chkptr, 10);
 
-		long value = strtol(str, &chkptr, 10);
-
-		if(type == PAGE) {
+	switch (type){
+		case PAGE:
 			if(value < 1 || value > 604) 
 				freendie("Bad input. Page must be 1-604");
 			page = value;
 			m = getmaqrabypage(page);
 			rstr = pmaqra(m);
+			phdr();
 			prstr(rstr);
-		}else if(type == MAQRA) {
+			pftr();
+			break;
+		case MAQRA:
 			if(value < 1 || value > 240) 
 				freendie("Bad input. Maqra must be 1-240");
-
 			m = getmaqra(value);
 			if(add){
 				m->status++;
 				m->date = (unsigned long)tme;
 			}
 			rstr = pmaqra(m);
+			phdr();
 			prstr(rstr);
-		}else if(type == JUZ){ 
+			pftr();
+			break;
+		case JUZ:
 			if(value < 1 || value > 30) 
 				freendie("Bad input. Juz must be 1-30");
 			long indx = value-1;
 			p = juzes[indx];
 			m = p->maqras[0];
+			phdr();
 			pjuzes(p);
-		}
-
-
-		if(spawn) {
-			if(fork() == 0){
-				char pstr[3];
-				int pchk = type == PAGE ? page : m->start;
-				sprintf(pstr, "%d", pchk + offset);
-
-				char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
-
-				execvp(pdfcmd[0], cmd); 
-
-				freendie("Launch failed");
-			}
-		}
-
-		if(add) if(!writedb()) freendie("Couldn't write to db");
-
-	}else {
-		plist();
+			pftr();
+			break;
+		default: plist();
 	}
-	pftr();
+
+
+	if(spawn) {
+		if(fork() == 0){
+			char pstr[3];
+			int pchk = type == PAGE ? page : m->start;
+			sprintf(pstr, "%d", pchk + offset);
+
+			char *cmd[] = {pdfcmd[0],pdfcmd[1], pstr, pdfcmd[2], NULL};
+
+			execvp(pdfcmd[0], cmd); 
+
+			freendie("Launch failed");
+		}
+	}
+
+	if(add) if(!writedb()) freendie("Couldn't write to db");
+
 	freendie(NULL);
 	return EXIT_SUCCESS;
 }
@@ -302,8 +303,10 @@ pdate(Maqra *m){
 
 void
 plist(){
+	int min = wirdms > 8 ? 8 : wirdms; 
 	qsort(wird, wirdms, sizeof(Maqra), cmpms);
-	int min = wirdms < 8 ? 8 : wirdms / 30; 
+	sflag = 1;
+	phdr();
 	for(int i=0;i<wirdms && i<min;i++){
 		char *str;
 
@@ -313,6 +316,7 @@ plist(){
 		prstr(str);
 		free(str);
 	}
+	pftr();
 }
 
 int
