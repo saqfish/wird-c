@@ -7,6 +7,18 @@
 #include "util.h"
 
 void
+usage(){
+	printf("%s\n", usgstr);
+	exit(EXIT_FAILURE);
+}
+void
+help(){
+	printf("%s\n", usgstr);
+	printf("%s\n", hlpstr);
+	exit(EXIT_SUCCESS);
+}
+
+void
 vdie(char *fmt, ...){
 
 	va_list ap;

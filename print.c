@@ -96,7 +96,7 @@ prstr(char *rstr){
 		if(sflag) {
 			char *str = gstatus(x);
 			if (validx) printf(" %-*s ", strlen(STR_STATUS) + STATUS_MAX, str);
-			else printf(" %*s ", strlen(STR_STATUS), " ");
+			else printf(" %*s ", strlen(STR_STATUS) + STATUS_MAX, " ");
 			printf("%s",HLINE);
 			free(str);
 		} 

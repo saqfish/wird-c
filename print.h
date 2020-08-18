@@ -10,7 +10,7 @@
 #define STR_JUZ "Juz" 
 #define STR_PAGES "Pages" 
 #define STR_STATUS "Time since" 
-#define STATUS_MAX 10
+#define STATUS_MAX 6
 
 #define VLINE "─" 
 #define HLINE "│" 

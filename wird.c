@@ -25,8 +25,6 @@ main(int argc, char **argv){
 	char *chkptr, *str;
 	time_t tme = time(NULL);
 
-	opterr = 0;
-
 	while ((opt = getopt(argc,argv, "oihraj:m:p:")) !=-1){
 		switch (opt){
 			case 'a':
@@ -54,9 +52,9 @@ main(int argc, char **argv){
 				  str = optarg;
 				  break;
 			case 'h': 
-				  die(hlpstr);
+				  help();
 				  break;
-			default: die(usgstr);
+			default: usage();
 		}
 	}
 
