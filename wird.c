@@ -72,9 +72,9 @@ main(int argc, char **argv){
 			page = value;
 			m = getmaqrabypage(page);
 			rstr = pmaqra(m);
-			phdr();
+			if(!raw) phdr();
 			prstr(rstr);
-			pftr();
+			if(!raw) pftr();
 			break;
 		case MAQRA:
 			if(value < 1 || value > 240) 
@@ -85,9 +85,9 @@ main(int argc, char **argv){
 				m->date = (unsigned long)tme;
 			}
 			rstr = pmaqra(m);
-			phdr();
+			if(!raw) phdr();
 			prstr(rstr);
-			pftr();
+			if(!raw) pftr();
 			break;
 		case JUZ:
 			if(value < 1 || value > 30) 
@@ -95,9 +95,9 @@ main(int argc, char **argv){
 			long indx = value-1;
 			p = juzes[indx];
 			m = p->maqras[0];
-			phdr();
+			if(!raw) phdr();
 			pjuzes(p);
-			pftr();
+			if(!raw) pftr();
 			break;
 		default: plist();
 	}
@@ -302,7 +302,7 @@ plist(){
 	int min = wirdms > 8 ? 8 : wirdms; 
 	qsort(wird, wirdms, sizeof(Maqra), cmpms);
 	sflag = 1;
-	phdr();
+	if(!raw) phdr();
 	for(int i=0;i<wirdms && i<min;i++){
 		char *str;
 
@@ -312,7 +312,7 @@ plist(){
 		prstr(str);
 		free(str);
 	}
-	pftr();
+	if(!raw) pftr();
 }
 
 int
