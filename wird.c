@@ -11,7 +11,7 @@
 #include "util.h"
 
 Juz *juzes[SIZE_JUZ];
-Maqra wird[240];
+Maqra *wird;
 
 char *rstr;
 int spawn, add, wirdms;
@@ -24,6 +24,10 @@ main(int argc, char **argv){
 	long value;
 	char *chkptr, *str;
 	time_t tme = time(NULL);
+
+	type = 0;
+
+	printf("size: %d\n", sizeof(Maqra));
 
 	while ((opt = getopt(argc,argv, "oihraj:m:p:")) !=-1){
 		switch (opt){
@@ -212,7 +216,14 @@ readdb(){
 
 		m->status = status;
 		m->date = date;
-		if(status) wird[wirdms++]=*m;
+		if(status) {
+			wirdms++;
+
+			if(wirdms) wird = realloc(wird, wirdms * sizeof(*wird));
+			else wird = malloc(sizeof(Maqra*));
+
+			wird[wirdms-1] = *m;
+		}
 	}
 	fclose(fd);
 	return 1;
@@ -310,6 +321,7 @@ plist(){
 		prstr(str);
 		free(str);
 	}
+	free(wird);
 	if(!raw) pftr();
 }
 
