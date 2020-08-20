@@ -11,6 +11,7 @@
 #define STR_PAGES "Pages" 
 #define STR_STATUS "Time since" 
 #define STATUS_MAX 6
+#define MINTIME 691200 // 8 days
 
 #define VLINE "─" 
 #define HLINE "│" 

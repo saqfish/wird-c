@@ -75,7 +75,7 @@ prstr(char *rstr){
 		sscanf(rstr, "M%03dS%03dE%03dJ%02dX%d", &m,&s,&e,&j,&x);
 
 		if (strlen(rstr) > 15) {
-			if(x >= (86400 * 3)) mclr = COLOR_RED;
+			if(x >= MINTIME) mclr = COLOR_RED;
 			else mclr = COLOR_GREEN;
 		}
 
