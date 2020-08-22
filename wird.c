@@ -27,8 +27,6 @@ main(int argc, char **argv){
 
 	type = 0;
 
-	printf("size: %d\n", sizeof(Maqra));
-
 	while ((opt = getopt(argc,argv, "oihraj:m:p:")) !=-1){
 		switch (opt){
 			case 'a':
@@ -39,6 +37,7 @@ main(int argc, char **argv){
 				spawn = 1;
 				break;
 			case 'i':
+				jflag = 1;
 				sflag = 1;
 				pflag = 1;
 				break;
@@ -52,7 +51,6 @@ main(int argc, char **argv){
 				  str = optarg;
 				  break;
 			case 'j': type = JUZ;
-				  jflag = 1;
 				  str = optarg;
 				  break;
 			case 'h': 
@@ -74,6 +72,7 @@ main(int argc, char **argv){
 			page = value;
 			m = getmaqrabypage(page);
 			rstr = pmaqra(m);
+			if(m->status) sflag=1;
 			if(!raw) phdr();
 			prstr(rstr);
 			if(!raw) pftr();
@@ -86,6 +85,7 @@ main(int argc, char **argv){
 				m->status++;
 				m->date = (unsigned long)tme;
 			}
+			if(m->status) sflag=1;
 			rstr = pmaqra(m);
 			if(!raw) phdr();
 			prstr(rstr);
@@ -146,7 +146,8 @@ getmaqra(int maqra){
 Maqra *
 getmaqrabypage(int page){
 	Juz *p;
-	Maqra *m;
+	Maqra *m = NULL;
+	Maqra *m2 = NULL;
 	int jindx;
 
 	jindx = (int) page / 20;
@@ -157,8 +158,9 @@ getmaqrabypage(int page){
 		for(int j=0;j<SIZE_MAQRA;j++){
 			m = p->maqras[j];
 			if(page >= m->start && page <= m->end)
-				return m;
+				m2 = m;	
 		}
+		if(m2 != NULL) return m2;
 	}
 	return NULL;
 }
