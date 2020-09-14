@@ -101,7 +101,9 @@ main(int argc, char **argv){
 			pjuzes(p);
 			if(!raw) pftr();
 			break;
-		default: plist();
+		default: 
+			if(wirdms > 0) plist();
+			else usage();
 	}
 
 
